@@ -587,6 +587,14 @@ func execute(attachPid int, processArgs []string, conf *config.Config, coreFile 
 	// Create and start a debugger server
 	switch APIVersion {
 	case 1, 2:
+
+		// It's possible conf is nil if a permissions failure happened during
+		// during LoadConfig()
+		var did []string
+		if conf != nil {
+			did = conf.DebugInfoDirectories
+		}
+
 		server = rpccommon.NewServer(&service.Config{
 			Listener:             listener,
 			ProcessArgs:          processArgs,
@@ -597,7 +605,7 @@ func execute(attachPid int, processArgs []string, conf *config.Config, coreFile 
 			Backend:              Backend,
 			CoreFile:             coreFile,
 			Foreground:           Headless,
-			DebugInfoDirectories: conf.DebugInfoDirectories,
+			DebugInfoDirectories: did,
 
 			DisconnectChan: disconnectChan,
 		})
